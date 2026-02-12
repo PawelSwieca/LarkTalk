@@ -1,0 +1,4 @@
+﻿id,name,description
+1,admin,Super user that manages server
+2,user,Regular user with basic privieleges
+3,vip_user,User with premuim plan

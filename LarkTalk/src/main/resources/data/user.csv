@@ -1,0 +1,4 @@
+"id","login","nickname","password_hash","email","created_at","last_login"
+"1","admin","Admin",$2a$10$yo.2pfr8HtWYZWB86sxEEuM7457yLod1cdHdk1soEAuzcyWB3SX4O,"aad@admin.pl","2025-01-01 00:00:01","2025-01-01 00:00:01"
+"2","paw3l","Pawel",$2a$10$yo.2pfr8HtWYZWB86sxEEuM7457yLod1cdHdk1soEAuzcyWB3SX4O,"the.candle7@wp.pl","2025-01-01 00:00:01","2025-01-01 00:00:01"
+"3","Catie7l","Catie",$2a$10$yo.2pfr8HtWYZWB86sxEEuM7457yLod1cdHdk1soEAuzcyWB3SX4O,"catie_morgan@gmail.com","2025-01-01 00:00:01","2025-01-01 00:00:01"

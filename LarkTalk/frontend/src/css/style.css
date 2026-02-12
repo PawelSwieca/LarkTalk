@@ -1,0 +1,127 @@
+:root {
+    font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+
+    --bg-color: #0f172a;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent-color: #6366f1;
+    --text-color: #f8fafc;
+
+}
+
+body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    background-image: radial-gradient(circle at 50% 0%, #312e81 0%, var(--bg-color) 60%);
+    color: var(--text-color);
+}
+
+#app {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+
+.login-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    padding: 3rem;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo {
+    height: 5em;
+    margin-bottom: 1.5em;
+    filter: drop-shadow(0 0 0.5em var(--accent-color));
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+h1 {
+    font-size: 2rem;
+    margin: 0;
+    background: linear-gradient(to right, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+h3 {
+    font-weight: 300;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.container_input {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+}
+
+.input_place {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    color: white;
+    font-size: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.input_place:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+.login_button {
+    width: 100%;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    color: white;
+    background: var(--accent-color);
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.login_button:hover {
+    background-color: #4f46e5;
+}
+
+.error-msg {
+    color: #f87171;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}

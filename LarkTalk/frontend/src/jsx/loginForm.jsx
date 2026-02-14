@@ -3,7 +3,7 @@ import "../css/style.css";
 import larkLogo from "../assets/logo/image.png";
 import Dashboard from "./Dashboard.jsx";
 
-export default function LoginForm() {
+export default function LoginForm({ onSwitchToSignup }) {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -91,6 +91,9 @@ export default function LoginForm() {
                 <button className="login_button" onClick={sendRequest}>
                     Sign in
                 </button>
+                <p className="switch-text">
+                    No account? <span onClick={onSwitchToSignup} className="link-btn">Sign up!</span>
+                </p>
             </div>
 
             {message && <p className="error-msg">{message}</p>}

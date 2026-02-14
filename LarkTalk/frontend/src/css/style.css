@@ -125,3 +125,44 @@ h3 {
     margin-top: 1rem;
     font-size: 0.9rem;
 }
+
+.input-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.input-error {
+    border-color: #f87171 !important;
+}
+
+.field-error {
+    color: #f87171;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    margin-left: 5px;
+}
+
+.switch-text {
+    margin-top: 20px;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.link-btn {
+    color: var(--accent-color);
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.link-btn:hover {
+    color: #a5b4fc;
+}
+
+.server-msg {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #fbbf24;
+}

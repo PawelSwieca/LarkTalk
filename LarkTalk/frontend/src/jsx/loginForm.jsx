@@ -42,6 +42,7 @@ export default function LoginForm({ onSwitchToSignup }) {
 
             localStorage.setItem("token", data.token);
             localStorage.setItem("userLogin", login);
+            localStorage.setItem("nickname", data.nickname);
 
             setIsLoggedIn(true);
 

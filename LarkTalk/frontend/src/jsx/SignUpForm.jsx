@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import larkLogo from "../assets/logo/image.png";
 import "../css/style.css";
 
-// 1. Odbieramy funkcję do przełączania widoku w propsach
 export default function SignUpForm({ onSwitchToLogin }) {
     const [formData, setFormData] = useState({
         login: "",
@@ -35,7 +34,7 @@ export default function SignUpForm({ onSwitchToLogin }) {
             newErrors.email = "Invalid email address!";
         }
         if (data.password && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(data.password)) {
-            newErrors.password = "Password: min. 8 characters, capital and small letter, digit and special character.";
+            newErrors.password = "Password: min. 8 characters, capital and small letter, digit and special character (no '.').";
         }
 
         return newErrors;

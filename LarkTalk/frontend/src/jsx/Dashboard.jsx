@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from "react";
-import "../css/dashboard.css";
+import React, {useEffect, useRef, useState} from "react"
+import "../css/dashboard.css"
+import "../css/chat.css"
 
 import just_chatting from "../assets/chat_logo/just_chatting.jpg"
 import games from "../assets/chat_logo/games.jpg"
@@ -13,7 +14,18 @@ export default function Dashboard({ onLogout }) {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const userLogin = localStorage.getItem("userLogin") || "User";
+    const userNickname = localStorage.getItem("nickname") || "Nickname";
     const storedLogin = localStorage.getItem("userLogin");
+
+    const [activeChat, setActiveChat] = useState(null);
+
+
+    const [messageInput, setMessageInput] = useState("");
+
+    // Simulation of messages
+    const [messages, setMessages] = useState([]);
+
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
         if (storedLogin) {
@@ -24,10 +36,15 @@ export default function Dashboard({ onLogout }) {
                 })
                 .then(data => {
                     setUserData(data);
+                    console.log(data);
                 })
                 .catch(err => console.error(err));
         }
     }, [storedLogin]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages, activeChat]);
 
     const chats = [
         { id: 1, name: "All in One!", img: just_chatting },
@@ -35,6 +52,34 @@ export default function Dashboard({ onLogout }) {
         { id: 3, name: "Programming", img: programming },
         { id: 4, name: "Video games", img: games },
     ];
+
+    const openChat = (chat) => {
+        setActiveChat(chat);
+        // Get chat history in the future...
+        setMessages([
+            { sender: "System", text: `Welcome in ${chat.name} chat!` },
+            { sender: "Bot", text: "Remember to be kind :)" }
+        ]);
+    };
+
+    const closeChat = () => {
+        setActiveChat(null);
+        setMessages([]);
+    };
+
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        if (!messageInput.trim()) return;
+
+        const newMessage = {
+            sender: userNickname,
+            text: messageInput,
+            isMe: true
+        };
+
+        setMessages([...messages, newMessage]);
+        setMessageInput("");
+    };
 
     const handleLogoutClick = () => {
         setShowLogoutConfirm(true);
@@ -59,7 +104,7 @@ export default function Dashboard({ onLogout }) {
     return (
         <div className="dashboard">
             <div className="dashboard-menu">
-                <span className="welcome-text">Welcome, <b>{userLogin}</b></span>
+                <span className="welcome-text">Welcome, <b>{userNickname}</b></span>
                 <div>
                     <button className="menu-button" id="profile" onClick={toggleProfile}>
                         👤 Profile
@@ -77,7 +122,7 @@ export default function Dashboard({ onLogout }) {
                                 {userData.login.charAt(0).toUpperCase()}
                             </div>
                             <h2>{userData.nickname}</h2>
-                            <p className="profile-role">User</p>
+                            <p className="profile-role">{userData.roles}</p>
                         </div>
 
                         <div className="profile-details">
@@ -102,10 +147,45 @@ export default function Dashboard({ onLogout }) {
                     </div>
                 </div>
             )}
+            {activeChat && (
+                <div className="modal-overlay" onClick={closeChat}>
+                    <div className="modal-content chat-window" onClick={(e) => e.stopPropagation()}>
+
+                        <div className="chat-window-header">
+                            <div className="chat-header-info">
+                                <img src={activeChat.img} alt="icon" className="mini-chat-icon"/>
+                                <h3>{activeChat.name}</h3>
+                            </div>
+                            <button className="close-chat-btn" onClick={closeChat}>✖</button>
+                        </div>
+
+                        <div className="chat-messages-area">
+                            {messages.map((msg, index) => (
+                                <div key={index} className={`message-bubble ${msg.isMe ? "my-message" : "other-message"}`}>
+                                    <span className="msg-sender">{msg.sender}</span>
+                                    <p className="msg-text">{msg.text}</p>
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        <form className="chat-input-bar" onSubmit={handleSendMessage}>
+                            <input
+                                type="text"
+                                placeholder="Write a message..."
+                                value={messageInput}
+                                onChange={(e) => setMessageInput(e.target.value)}
+                                autoFocus
+                            />
+                            <button type="submit" className="send-btn">➤</button>
+                        </form>
+                    </div>
+                </div>
+            )}
             <h1 className="dashboard-title">Select room</h1>
             <div className="chat-grid">
                 {chats.map((chat) => (
-                    <div className="chat-card" key={chat.id}>
+                    <div className="chat-card" key={chat.id} onClick={() => openChat(chat)}>
                         <div className="chat-image-wrapper">
                             <img
                                 src={chat.img}

@@ -57,8 +57,8 @@ export default function Dashboard({ onLogout }) {
         setActiveChat(chat);
         // Get chat history in the future...
         setMessages([
-            { sender: "System", text: `Welcome in ${chat.name} chat!` },
-            { sender: "Bot", text: "Remember to be kind :)" }
+            { sender: "System", date: new Date().toDateString(), text: `Welcome in ${chat.name} chat!` },
+            { sender: "Bot", date: new Date().toDateString(), text: "Remember to be kind :)" }
         ]);
     };
 
@@ -67,18 +67,59 @@ export default function Dashboard({ onLogout }) {
         setMessages([]);
     };
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
+
         if (!messageInput.trim()) return;
 
-        const newMessage = {
-            sender: userNickname,
-            text: messageInput,
-            isMe: true
+        // Payload for backend - active chat + content
+        // Sender and data will be set by Spring controller
+        const backendPayload = {
+            chatId: activeChat.id,
+            content: messageInput
         };
 
-        setMessages([...messages, newMessage]);
-        setMessageInput("");
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch("/api/messages", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(backendPayload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            // --- SUCCESS! ---
+
+            // Get date from database
+            const data = await response.json();
+
+            const newMessageLocal = {
+                sender: userNickname,
+                date: new Date(data.timestamp).toLocaleString([], {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
+                text: messageInput,
+                isMe: true
+            };
+
+            setMessages([...messages, newMessageLocal]);
+            setMessageInput("");
+
+        } catch(err) {
+            console.error("Message sending error: ", err);
+            alert("Message sending error! Try again!");
+        }
     };
 
     const handleLogoutClick = () => {
@@ -163,6 +204,7 @@ export default function Dashboard({ onLogout }) {
                             {messages.map((msg, index) => (
                                 <div key={index} className={`message-bubble ${msg.isMe ? "my-message" : "other-message"}`}>
                                     <span className="msg-sender">{msg.sender}</span>
+                                    <span className="msg-date">{msg.date}</span>
                                     <p className="msg-text">{msg.text}</p>
                                 </div>
                             ))}

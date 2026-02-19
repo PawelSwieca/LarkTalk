@@ -1,5 +1,5 @@
 package com.candle.larktalk.model;
 
-enum MessageType {
+public enum MessageType {
     TEXT, IMAGE, VIDEO, AUDIO
 }

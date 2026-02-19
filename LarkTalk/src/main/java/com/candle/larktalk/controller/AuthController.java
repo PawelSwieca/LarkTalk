@@ -1,13 +1,7 @@
 package com.candle.larktalk.controller;
 
-import com.candle.larktalk.model.Channel;
-import com.candle.larktalk.model.Role;
-import com.candle.larktalk.model.User;
-import com.candle.larktalk.model.UserChannelAccess;
-import com.candle.larktalk.repository.ChannelRepository;
-import com.candle.larktalk.repository.RoleRepository;
-import com.candle.larktalk.repository.UserChannelAccessRepository;
-import com.candle.larktalk.repository.UserRepository;
+import com.candle.larktalk.model.*;
+import com.candle.larktalk.repository.*;
 import com.candle.larktalk.request.UserRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -27,20 +21,25 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final ChannelRepository channelRepository;
     private final UserChannelAccessRepository accessRepository;
+    private final MessageRepository messageRepository;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
                           RoleRepository roleRepository, ChannelRepository channelRepository,
-                          UserChannelAccessRepository accessRepository) {
+                          UserChannelAccessRepository accessRepository,
+                          MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.channelRepository = channelRepository;
         this.accessRepository = accessRepository;
+        this.messageRepository = messageRepository;
     }
 
     record LoginRequest(String login, String password) {}
 
     record UserProfileDto(String login, String nickname, String email, String createdAt, String roles) {}
+
+    record MessageRequest(Long chatId, String content) {}
 
 
     @PostMapping("/signup")
@@ -124,5 +123,49 @@ public class AuthController {
         }
 
         return ResponseEntity.status(404).body("That user doesn't exist");
+    }
+    @PostMapping("/messages")
+    public ResponseEntity<?> saveMessage(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody MessageRequest request
+    ) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer fake-jwt-token-for-")) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
+        String login = authHeader.replace("Bearer fake-jwt-token-for-", "");
+
+        Optional<User> userOpt = userRepository.findByLogin(login);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "User not found"));
+        }
+
+        User sender = userOpt.get();
+
+        System.out.println("User " + sender.getLogin() + " sends a message: " + request.content());
+
+        Optional<Channel> channelOpt = channelRepository.findById(request.chatId());
+        if (channelOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Channel not found"));
+        }
+        Channel channel = channelOpt.get();
+
+        Message message = new Message();
+        message.setContent(request.content());
+        message.setSender(sender);
+        message.setChannel(channel);
+        message.setType(MessageType.TEXT); // Now we send text only!
+        message.setTimestamp(LocalDateTime.now());
+
+        Message savedMessage = messageRepository.save(message);
+
+        System.out.println("Message send to: " + channel.getName() + " from: " + sender.getLogin());
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "messageId", savedMessage.getId(),
+                "timestamp", savedMessage.getTimestamp().toString()
+        ));
     }
 }

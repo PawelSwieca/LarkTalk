@@ -21,25 +21,25 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final ChannelRepository channelRepository;
     private final UserChannelAccessRepository accessRepository;
-    private final MessageRepository messageRepository;
+//    private final MessageRepository messageRepository;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
                           RoleRepository roleRepository, ChannelRepository channelRepository,
-                          UserChannelAccessRepository accessRepository,
-                          MessageRepository messageRepository) {
+                          UserChannelAccessRepository accessRepository
+                          ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.channelRepository = channelRepository;
         this.accessRepository = accessRepository;
-        this.messageRepository = messageRepository;
+//        this.messageRepository = messageRepository;
     }
 
     record LoginRequest(String login, String password) {}
 
     record UserProfileDto(String login, String nickname, String email, String createdAt, String roles) {}
 
-    record MessageRequest(Long chatId, String content) {}
+//    record MessageRequest(Long chatId, String content) {}
 
 
     @PostMapping("/signup")
@@ -124,48 +124,48 @@ public class AuthController {
 
         return ResponseEntity.status(404).body("That user doesn't exist");
     }
-    @PostMapping("/messages")
-    public ResponseEntity<?> saveMessage(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody MessageRequest request
-    ) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer fake-jwt-token-for-")) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Unauthorized"));
-        }
-
-        String login = authHeader.replace("Bearer fake-jwt-token-for-", "");
-
-        Optional<User> userOpt = userRepository.findByLogin(login);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "User not found"));
-        }
-
-        User sender = userOpt.get();
-
-        System.out.println("User " + sender.getLogin() + " sends a message: " + request.content());
-
-        Optional<Channel> channelOpt = channelRepository.findById(request.chatId());
-        if (channelOpt.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Channel not found"));
-        }
-        Channel channel = channelOpt.get();
-
-        Message message = new Message();
-        message.setContent(request.content());
-        message.setSender(sender);
-        message.setChannel(channel);
-        message.setType(MessageType.TEXT); // Now we send text only!
-        message.setTimestamp(LocalDateTime.now());
-
-        Message savedMessage = messageRepository.save(message);
-
-        System.out.println("Message send to: " + channel.getName() + " from: " + sender.getLogin());
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "messageId", savedMessage.getId(),
-                "timestamp", savedMessage.getTimestamp().toString()
-        ));
-    }
+//    @PostMapping("/messages")
+//    public ResponseEntity<?> saveMessage(
+//            @RequestHeader(value = "Authorization", required = false) String authHeader,
+//            @RequestBody MessageRequest request
+//    ) {
+//
+//        if (authHeader == null || !authHeader.startsWith("Bearer fake-jwt-token-for-")) {
+//            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Unauthorized"));
+//        }
+//
+//        String login = authHeader.replace("Bearer fake-jwt-token-for-", "");
+//
+//        Optional<User> userOpt = userRepository.findByLogin(login);
+//        if (userOpt.isEmpty()) {
+//            return ResponseEntity.status(401).body(Map.of("success", false, "message", "User not found"));
+//        }
+//
+//        User sender = userOpt.get();
+//
+//        System.out.println("User " + sender.getLogin() + " sends a message: " + request.content());
+//
+//        Optional<Channel> channelOpt = channelRepository.findById(request.chatId());
+//        if (channelOpt.isEmpty()) {
+//            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Channel not found"));
+//        }
+//        Channel channel = channelOpt.get();
+//
+//        Message message = new Message();
+//        message.setContent(request.content());
+//        message.setSender(sender);
+//        message.setChannel(channel);
+//        message.setType(MessageType.TEXT); // Now we send text only!
+//        message.setTimestamp(LocalDateTime.now());
+//
+//        Message savedMessage = messageRepository.save(message);
+//
+//        System.out.println("Message send to: " + channel.getName() + " from: " + sender.getLogin());
+//
+//        return ResponseEntity.ok(Map.of(
+//                "success", true,
+//                "messageId", savedMessage.getId(),
+//                "timestamp", savedMessage.getTimestamp().toString()
+//        ));
+//    }
 }

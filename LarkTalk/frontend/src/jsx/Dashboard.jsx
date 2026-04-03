@@ -46,20 +46,85 @@ export default function Dashboard({ onLogout }) {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, activeChat]);
 
-    const chats = [
-        { id: 1, name: "All in One!", img: just_chatting },
-        { id: 2, name: "History", img: history },
-        { id: 3, name: "Programming", img: programming },
-        { id: 4, name: "Video games", img: games },
-    ];
+    const getChannelImage = (channelId, channelName) => {
+        switch(channelId) {
+            case 1: return just_chatting;
+            case 2: return history;
+            case 3: return programming;
+            case 4: return games;
+            default: return just_chatting;
+        }
+    };
+
+    const [chats, setChats] = useState([]);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        fetch("/api/channels/my", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Loading channels failed: " + res.statusText);
+                return res.json();
+            })
+            .then(data => {
+                const channelsWithImages = data.map(channel => ({
+                    id: channel.id,
+                    name: channel.name,
+                    img: getChannelImage(channel.id, channel.name)
+                }));
+
+                setChats(channelsWithImages);
+            })
+            .catch(err => console.error(err));
+
+    }, []);
+
+    const loadMessages = async (chatId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const userLogin = localStorage.getItem("userLogin");
+
+            const response = await fetch(`/api/messages?chatId=${chatId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            return data.map(msg => ({
+                sender: msg.userName,
+                text: msg.content,
+                date: new Date(msg.timestamp).toLocaleString([], {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }),
+                isMe: msg.userName === userLogin
+            }));
+
+        } catch (err) {
+            console.error("Messages loading error: ", err);
+            return [];
+        }
+    }
 
     const openChat = (chat) => {
         setActiveChat(chat);
-        // Get chat history in the future...
-        setMessages([
-            { sender: "System", date: new Date().toDateString(), text: `Welcome in ${chat.name} chat!` },
-            { sender: "Bot", date: new Date().toDateString(), text: "Remember to be kind :)" }
-        ]);
+        loadMessages(chat.id).then(messages => {
+            setMessages(messages);
+        });
     };
 
     const closeChat = () => {

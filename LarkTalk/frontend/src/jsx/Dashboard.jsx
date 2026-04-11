@@ -212,6 +212,11 @@ export default function Dashboard({ onLogout }) {
             <div className="dashboard-menu">
                 <span className="welcome-text">Welcome, <b>{userNickname}</b></span>
                 <div>
+                    {userData && userData.roles.includes("admin") && (
+                        <button className="menu-button" id="admin-panel">
+                            🧑🏻‍💼 Manage
+                        </button>
+                    )}
                     <button className="menu-button" id="profile" onClick={toggleProfile}>
                         👤 Profile
                     </button>

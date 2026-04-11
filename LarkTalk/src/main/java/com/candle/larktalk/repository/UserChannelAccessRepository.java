@@ -13,4 +13,6 @@ public interface UserChannelAccessRepository extends JpaRepository<UserChannelAc
     Optional<UserChannelAccess> findByUserIdAndChannelId(Long userId, Long channelId);
 
     List<UserChannelAccess> findByUserId(Long userId);
+
+    long countByChannelId(Long channelId);
 }
